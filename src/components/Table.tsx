@@ -42,3 +42,42 @@ export default function Table({ columns, data }: { columns: any[]; data: any[] }
     </div>
   );
 }
+// import React from 'react';
+//
+// import { TableProps } from '../types/types';
+//
+// const Table: React.FC<TableProps> = ({ columns, data, onRowClick }) => {
+//   return (
+//     <table className="border-tools-table-outline text-lef w-full min-w-[400px] border-separate rounded-lg border">
+//       <thead>
+//         <tr className="bg-neutral-400">
+//           {columns.map((column) => (
+//             <th key={column.accessor} className="px-4 py-2">
+//               {' '}
+//               {/* Adjust padding here */}
+//               {column.header}
+//             </th>
+//           ))}
+//         </tr>
+//       </thead>
+//       <tbody>
+//         {data.map((row, index) => (
+//           <tr
+//             key={row.slabNo}
+//             onClick={() => onRowClick(row)}
+//             className={`cursor-pointer ${index % 2 === 0 ? 'bg-red-500' : 'bg-blue-500'}`}
+//           >
+//             {columns.map((column) => (
+//               <td key={column.accessor}>
+//                 {/* Adjust padding here */}
+//                 {row[column.accessor]}
+//               </td>
+//             ))}
+//           </tr>
+//         ))}
+//       </tbody>
+//     </table>
+//   );
+// };
+//
+// export default Table;
