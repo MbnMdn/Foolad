@@ -1,6 +1,6 @@
 import BasicLineChart from '../Charts/BasicLineChart';
 
-export default function TemperatureSection() {
+export default function TemperatureSection({ response }: { response: any }) {
   return (
     <div>
       <h3 className=" text-lg font-bold">Temperature</h3>

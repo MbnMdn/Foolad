@@ -19,8 +19,8 @@ const BasicLineChart: React.FC<BasicLineChartProps> = ({ xAxisData, seriesData }
           // color: '#312E81',
         },
       ]}
-      width={400}
-      height={200}
+      width={600}
+      height={300}
     />
   );
 };

@@ -1,13 +1,29 @@
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Slider from '@mui/material/Slider';
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useEffect, useState } from 'react';
 
 import api from '../scripts/api';
 
+interface State {
+  open: boolean;
+  vertical: 'top' | 'bottom';
+  horizontal: 'left' | 'center' | 'right';
+}
+
 export default function AI() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = React.useState(true);
+
+  // const [open, setOpen] = React.useState(false);
+  const [state, setState] = useState<State>({
+    open: false,
+    vertical: 'bottom',
+    horizontal: 'right',
+  });
+  const { vertical, horizontal, open } = state;
 
   const [partCount, setPartCount] = useState<number | undefined>(undefined);
   const [n1, setN1] = useState<number>(0);
@@ -17,6 +33,11 @@ export default function AI() {
   const [paddingBottom, setPaddingBottom] = useState<number>(0);
   const [paddingRight, setPaddingRight] = useState<number>(0);
   const [paddingLeft, setPaddingLeft] = useState<number>(0);
+
+  const [paddingTopX100, setPaddingTopX100] = useState<number>(0);
+  const [paddingBottomX100, setPaddingBottomX100] = useState<number>(0);
+  const [paddingRightX100, setPaddingRightX100] = useState<number>(0);
+  const [paddingLeftX100, setPaddingLeftX100] = useState<number>(0);
 
   const [h1, setH1] = useState<number[]>([20, 100]);
   const [s1, setS1] = useState<number[]>([20, 100]);
@@ -68,15 +89,20 @@ export default function AI() {
 
       const fetchedData = response?.data;
       setData(fetchedData);
-      console.log(fetchedData);
       setPartCount(fetchedData?.part_count);
       setN1(fetchedData?.N1);
       setN2(fetchedData?.N2);
       setSigma(fetchedData?.sigma);
+
       setPaddingTop(fetchedData?.paddings.top);
       setPaddingBottom(fetchedData?.paddings.bottom);
       setPaddingRight(fetchedData?.paddings.right);
       setPaddingLeft(fetchedData?.paddings.left);
+
+      setPaddingTopX100(fetchedData?.paddings.top * 100);
+      setPaddingBottomX100(fetchedData?.paddings.bottom * 100);
+      setPaddingRightX100(fetchedData?.paddings.right * 100);
+      setPaddingLeftX100(fetchedData?.paddings.left * 100);
 
       setH1(fetchedData?.threshold1.H);
       setS1(fetchedData?.threshold1.S);
@@ -131,10 +157,23 @@ export default function AI() {
     try {
       const response = await api.post('/settings', payload);
       console.log('Settings updated successfully:', response.data);
+      setState({ ...state, open: true });
     } catch (error) {
       console.error('Error updating settings:', error);
     }
   };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setState({ ...state, open: false });
+  };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div>
@@ -142,7 +181,7 @@ export default function AI() {
         <div className="flex flex-col gap-10">
           <div className="grid grid-cols-1 gap-10 min-[600px]:grid-cols-2 min-[1030px]:grid-cols-3 min-[1400px]:grid-cols-4">
             <div>
-              <p className="font-semibold">Part Count</p>
+              <p className="font-semibold">Number of Parts</p>
               <TextField
                 type="number"
                 // value={partCount}
@@ -155,7 +194,7 @@ export default function AI() {
               />
             </div>
             <div>
-              <p className="font-semibold">N1</p>
+              <p className="font-semibold">Edge Detection Min Pixel</p>
               <TextField
                 size={'small'}
                 type="number"
@@ -167,7 +206,7 @@ export default function AI() {
               />
             </div>
             <div>
-              <p className="font-semibold">N2</p>
+              <p className="font-semibold">Region Detection Min Pixel</p>
               <TextField
                 size={'small'}
                 type="number"
@@ -179,7 +218,7 @@ export default function AI() {
               />
             </div>
             <div>
-              <p className="font-semibold">Sigma</p>
+              <p className="font-semibold">Gaussian Kernel Size</p>
               <TextField
                 size={'small'}
                 type="number"
@@ -195,9 +234,10 @@ export default function AI() {
               <TextField
                 size={'small'}
                 type="number"
-                value={paddingTop}
+                value={paddingTopX100}
                 onChange={(e) => {
-                  setPaddingTop(Number(e.target.value));
+                  setPaddingTop(Number(e.target.value) / 100);
+                  setPaddingTopX100(Number(e.target.value));
                 }}
                 className="w-52"
               />
@@ -207,9 +247,10 @@ export default function AI() {
               <TextField
                 size={'small'}
                 type="number"
-                value={paddingBottom}
+                value={paddingBottomX100}
                 onChange={(e) => {
-                  setPaddingBottom(Number(e.target.value));
+                  setPaddingBottom(Number(e.target.value) / 100);
+                  setPaddingBottomX100(Number(e.target.value));
                 }}
                 className="w-52"
               />
@@ -219,9 +260,10 @@ export default function AI() {
               <TextField
                 size={'small'}
                 type="number"
-                value={paddingRight}
+                value={paddingRightX100}
                 onChange={(e) => {
-                  setPaddingRight(Number(e.target.value));
+                  setPaddingRight(Number(e.target.value) / 100);
+                  setPaddingRightX100(Number(e.target.value));
                 }}
                 className="w-52"
               />
@@ -231,26 +273,19 @@ export default function AI() {
               <TextField
                 size={'small'}
                 type="number"
-                value={paddingLeft}
+                value={paddingLeftX100}
                 onChange={(e) => {
-                  setPaddingLeft(Number(e.target.value));
+                  setPaddingLeft(Number(e.target.value) / 100);
+                  setPaddingLeftX100(Number(e.target.value));
                 }}
                 className="w-52"
               />
             </div>
-            {/*<div>*/}
-            {/*  <p className="font-semibold">Threshold</p>*/}
-            {/*  <TextField size={'small'} type="number" className="w-52" />*/}
-            {/*</div>*/}
-            {/*<div>*/}
-            {/*  <p className="font-semibold">Part Count</p>*/}
-            {/*  <TextField size={'small'} type="number" className="w-52" />*/}
-            {/*</div>*/}
           </div>
 
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Threshold 1:</p>
+              <p className="font-semibold">Main Slab Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
                 <div className="flex gap-5">
                   <p className="font-semibold">H</p>
@@ -291,7 +326,7 @@ export default function AI() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Threshold 2:</p>
+              <p className="font-semibold">Sub Slab Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
                 <div className="flex gap-5">
                   <p className="font-semibold">H</p>
@@ -332,7 +367,7 @@ export default function AI() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Threshold 3:</p>
+              <p className="font-semibold">Feature Detection Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
                 <div className="flex gap-5">
                   <p className="font-semibold">H</p>
@@ -381,6 +416,22 @@ export default function AI() {
           >
             Update
           </Button>
+          <Snackbar
+            anchorOrigin={{ vertical, horizontal }}
+            open={open}
+            onClose={handleClose}
+            key={vertical + horizontal}
+            autoHideDuration={3000}
+          >
+            <Alert
+              onClose={handleClose}
+              severity="success"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              Updated Successfully
+            </Alert>
+          </Snackbar>
         </div>
       )}
     </div>

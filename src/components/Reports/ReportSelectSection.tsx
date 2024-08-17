@@ -54,7 +54,7 @@ export default function ReportSelectSection() {
       const response = await api.get('/get_slabs', {
         params: {
           page: 1,
-          limit: 10,
+          limit: 100,
           begin_date: fromDateString,
           end_date: toDateString,
         },

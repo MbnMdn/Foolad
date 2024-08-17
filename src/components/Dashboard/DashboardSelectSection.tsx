@@ -1,9 +1,10 @@
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
-import Switch, { SwitchProps } from '@mui/material/Switch';
+import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import React, { useEffect, useState } from 'react';
+
+import api from '../../scripts/api';
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
   width: 28,
@@ -25,7 +26,6 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
       color: '#fff',
       '& + .MuiSwitch-track': {
         opacity: 1,
-        // backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
       },
     },
   },
@@ -47,28 +47,88 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-export default function DashboardSelectSection() {
+interface DashboardSelectSectionProps {
+  dataRecordOn: boolean;
+  setDataRecordOn: React.Dispatch<React.SetStateAction<boolean>>;
+  pictureTypeOn: boolean;
+  setPictureTypeOn: React.Dispatch<React.SetStateAction<boolean>>;
+  pollingOn: boolean;
+  setPollingOn: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const DashboardSelectSection: React.FC<DashboardSelectSectionProps> = ({
+  dataRecordOn,
+  setDataRecordOn,
+  pictureTypeOn,
+  setPictureTypeOn,
+  pollingOn,
+  setPollingOn,
+}) => {
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchData = async () => {
+    try {
+      const req = await api.post('/system_state/', {
+        params: {},
+      });
+
+      setDataRecordOn(req?.data?.state);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchData().then(() => setLoading(false));
+  // }, []);
+
   return (
-    <div className="flex flex-col gap-3 rounded-xl border-2  border-mainBlue p-5 lg:flex-row lg:gap-10">
-      <div className="flex  gap-2">
+    <div className="flex flex-col gap-3 rounded-xl border-2 border-mainBlue p-5 lg:flex-row lg:gap-10">
+      <div className="flex items-center gap-2">
         <p className="text-lg font-bold">Data Record</p>
         <Stack direction="row" spacing={1} alignItems="center">
           <Typography>Off</Typography>
-          <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} />
+          <AntSwitch
+            checked={dataRecordOn}
+            onChange={() => {
+              fetchData();
+            }}
+            inputProps={{ 'aria-label': 'Data Record' }}
+          />
           <Typography>On</Typography>
         </Stack>
       </div>
 
-      <p className="text-lg font-bold">Slab Detection</p>
-
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <p className="text-lg font-bold">Picture Type</p>
         <Stack direction="row" spacing={1} alignItems="center">
           <Typography>Raw</Typography>
-          <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} />
+          <AntSwitch
+            checked={pictureTypeOn}
+            onChange={() => setPictureTypeOn(!pictureTypeOn)}
+            inputProps={{ 'aria-label': 'Picture Type' }}
+          />
           <Typography>Processed</Typography>
         </Stack>
       </div>
+
+      <div className="flex items-center gap-2">
+        <p className="text-lg font-bold">Polling</p>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography>Off</Typography>
+          <AntSwitch
+            checked={pollingOn}
+            onChange={() => setPollingOn(!pollingOn)}
+            inputProps={{ 'aria-label': 'Polling' }}
+          />
+          <Typography>On</Typography>
+        </Stack>
+        <div
+          className={`h-6 w-6 rounded-full ${pollingOn ? 'bg-green-500' : 'bg-red-600'}`}
+        ></div>
+      </div>
     </div>
   );
-}
+};
+
+export default DashboardSelectSection;
