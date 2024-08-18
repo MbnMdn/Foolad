@@ -1,6 +1,5 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Slider from '@mui/material/Slider';
 import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import React, { useEffect, useState } from 'react';
@@ -14,10 +13,9 @@ interface State {
 }
 
 export default function AI() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // const [open, setOpen] = React.useState(false);
   const [state, setState] = useState<State>({
     open: false,
     vertical: 'bottom',
@@ -29,6 +27,7 @@ export default function AI() {
   const [n1, setN1] = useState<number>(0);
   const [n2, setN2] = useState<number>(0);
   const [sigma, setSigma] = useState<number>(0);
+
   const [paddingTop, setPaddingTop] = useState<number>(0);
   const [paddingBottom, setPaddingBottom] = useState<number>(0);
   const [paddingRight, setPaddingRight] = useState<number>(0);
@@ -39,89 +38,96 @@ export default function AI() {
   const [paddingRightX100, setPaddingRightX100] = useState<number>(0);
   const [paddingLeftX100, setPaddingLeftX100] = useState<number>(0);
 
-  const [h1, setH1] = useState<number[]>([20, 100]);
-  const [s1, setS1] = useState<number[]>([20, 100]);
-  const [v1, setV1] = useState<number[]>([20, 100]);
+  const [h1From, setH1From] = useState<number>(0);
+  const [h1To, setH1To] = useState<number>(0);
+  const [s1From, setS1From] = useState<number>(0);
+  const [s1To, setS1To] = useState<number>(0);
+  const [v1From, setV1From] = useState<number>(0);
+  const [v1To, setV1To] = useState<number>(0);
 
-  const [h2, setH2] = useState<number[]>([20, 100]);
-  const [s2, setS2] = useState<number[]>([20, 100]);
-  const [v2, setV2] = useState<number[]>([20, 100]);
+  const [h2From, setH2From] = useState<number>(0);
+  const [h2To, setH2To] = useState<number>(0);
+  const [s2From, setS2From] = useState<number>(0);
+  const [s2To, setS2To] = useState<number>(0);
+  const [v2From, setV2From] = useState<number>(0);
+  const [v2To, setV2To] = useState<number>(0);
 
-  const [h3, setH3] = useState<number[]>([20, 100]);
-  const [s3, setS3] = useState<number[]>([20, 100]);
-  const [v3, setV3] = useState<number[]>([20, 100]);
+  const [h3From, setH3From] = useState<number>(0);
+  const [h3To, setH3To] = useState<number>(0);
+  const [s3From, setS3From] = useState<number>(0);
+  const [s3To, setS3To] = useState<number>(0);
+  const [v3From, setV3From] = useState<number>(0);
+  const [v3To, setV3To] = useState<number>(0);
 
-  const handleChangeH1 = (event: Event, newValue: number | number[]) => {
-    setH1(newValue as number[]);
-  };
-  const handleChangeS1 = (event: Event, newValue: number | number[]) => {
-    setS1(newValue as number[]);
-  };
-  const handleChangeV1 = (event: Event, newValue: number | number[]) => {
-    setV1(newValue as number[]);
-  };
-
-  const handleChangeH2 = (event: Event, newValue: number | number[]) => {
-    setH2(newValue as number[]);
-  };
-  const handleChangeS2 = (event: Event, newValue: number | number[]) => {
-    setS2(newValue as number[]);
-  };
-  const handleChangeV2 = (event: Event, newValue: number | number[]) => {
-    setV2(newValue as number[]);
-  };
-
-  const handleChangeH3 = (event: Event, newValue: number | number[]) => {
-    setH3(newValue as number[]);
-  };
-  const handleChangeS3 = (event: Event, newValue: number | number[]) => {
-    setS3(newValue as number[]);
-  };
-  const handleChangeV3 = (event: Event, newValue: number | number[]) => {
-    setV3(newValue as number[]);
-  };
-
+  const [h4From, setH4From] = useState<number>(0);
+  const [h4To, setH4To] = useState<number>(0);
+  const [s4From, setS4From] = useState<number>(0);
+  const [s4To, setS4To] = useState<number>(0);
+  const [v4From, setV4From] = useState<number>(0);
+  const [v4To, setV4To] = useState<number>(0);
   const fetchData = async () => {
     try {
-      const response = await api.get('/settings', {
+      const response = await api.get('/settings/ai', {
         params: {},
       });
 
-      const fetchedData = response?.data;
+      const fetchedData = response.data;
+
       setData(fetchedData);
-      setPartCount(fetchedData?.part_count);
-      setN1(fetchedData?.N1);
-      setN2(fetchedData?.N2);
-      setSigma(fetchedData?.sigma);
+      console.log(fetchedData);
 
-      setPaddingTop(fetchedData?.paddings.top);
-      setPaddingBottom(fetchedData?.paddings.bottom);
-      setPaddingRight(fetchedData?.paddings.right);
-      setPaddingLeft(fetchedData?.paddings.left);
+      setPartCount(fetchedData?.settings_data?.part_count);
+      setN1(fetchedData?.settings_data?.N1);
+      setN2(fetchedData?.settings_data?.N2);
+      setSigma(fetchedData?.settings_data?.sigma);
 
-      setPaddingTopX100(fetchedData?.paddings.top * 100);
-      setPaddingBottomX100(fetchedData?.paddings.bottom * 100);
-      setPaddingRightX100(fetchedData?.paddings.right * 100);
-      setPaddingLeftX100(fetchedData?.paddings.left * 100);
+      setPaddingTop(fetchedData?.settings_data?.paddings.top);
+      setPaddingBottom(fetchedData?.settings_data?.paddings.bottom);
+      setPaddingRight(fetchedData?.settings_data?.paddings.right);
+      setPaddingLeft(fetchedData?.settings_data?.paddings.left);
 
-      setH1(fetchedData?.threshold1.H);
-      setS1(fetchedData?.threshold1.S);
-      setV1(fetchedData?.threshold1.V);
+      setPaddingTopX100(fetchedData?.settings_data?.paddings.top * 100);
+      setPaddingBottomX100(fetchedData?.settings_data?.paddings.bottom * 100);
+      setPaddingRightX100(fetchedData?.settings_data?.paddings.right * 100);
+      setPaddingLeftX100(fetchedData?.settings_data?.paddings.left * 100);
 
-      setH2(fetchedData?.threshold2.H);
-      setS2(fetchedData?.threshold2.S);
-      setV2(fetchedData?.threshold2.V);
+      setH1From(fetchedData?.settings_data?.obj_thresh?.H[0]);
+      setH1To(fetchedData?.settings_data?.obj_thresh?.H[1]);
+      setS1From(fetchedData?.settings_data?.obj_thresh?.S[0]);
+      setS1To(fetchedData?.settings_data?.obj_thresh?.S[1]);
+      setV1From(fetchedData?.settings_data?.obj_thresh?.V[0]);
+      setV1To(fetchedData?.settings_data?.obj_thresh?.V[1]);
 
-      setH3(fetchedData?.threshold3.H);
-      setS3(fetchedData?.threshold3.S);
-      setV3(fetchedData?.threshold3.V);
+      setH2From(fetchedData?.settings_data?.horizontal_temp_thresh?.H[0]);
+      setH2To(fetchedData?.settings_data?.horizontal_temp_thresh?.H[1]);
+      setS2From(fetchedData?.settings_data?.horizontal_temp_thresh?.S[0]);
+      setS2To(fetchedData?.settings_data?.horizontal_temp_thresh?.S[1]);
+      setV2From(fetchedData?.settings_data?.horizontal_temp_thresh?.V[0]);
+      setV2To(fetchedData?.settings_data?.horizontal_temp_thresh?.V[1]);
+
+      setH3From(fetchedData?.settings_data?.zero_shot_thresh?.H[0]);
+      setH3To(fetchedData?.settings_data?.zero_shot_thresh?.H[1]);
+      setS3From(fetchedData?.settings_data?.zero_shot_thresh?.S[0]);
+      setS3To(fetchedData?.settings_data?.zero_shot_thresh?.S[1]);
+      setV3From(fetchedData?.settings_data?.zero_shot_thresh?.V[0]);
+      setV3To(fetchedData?.settings_data?.zero_shot_thresh?.V[1]);
+
+      setH4From(fetchedData?.settings_data?.vertical_temp_thresh?.H[0]);
+      setH4To(fetchedData?.settings_data?.vertical_temp_thresh?.H[1]);
+      setS4From(fetchedData?.settings_data?.vertical_temp_thresh?.S[0]);
+      setS4To(fetchedData?.settings_data?.vertical_temp_thresh?.S[1]);
+      setV4From(fetchedData?.settings_data?.vertical_temp_thresh?.V[0]);
+      setV4To(fetchedData?.settings_data?.vertical_temp_thresh?.V[1]);
+
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData().then(() => setLoading(false));
+    fetchData();
   }, []);
 
   const handleSubmit = async () => {
@@ -134,28 +140,28 @@ export default function AI() {
       N1: n1,
       N2: n2,
       sigma: sigma,
-      threshold1_H_From: h1[0],
-      threshold1_H_To: h1[1],
-      threshold1_S_From: s1[0],
-      threshold1_S_To: s1[1],
-      threshold1_V_From: v1[0],
-      threshold1_V_To: v1[1],
-      threshold2_H_From: h2[0],
-      threshold2_H_To: h2[1],
-      threshold2_S_From: s2[0],
-      threshold2_S_To: s2[1],
-      threshold2_V_From: v2[0],
-      threshold2_V_To: v2[1],
-      threshold3_H_From: h3[0],
-      threshold3_H_To: h3[1],
-      threshold3_S_From: s3[0],
-      threshold3_S_To: s3[1],
-      threshold3_V_From: v3[0],
-      threshold3_V_To: v3[1],
+      threshold1_H_From: h1From,
+      threshold1_H_To: h1To,
+      threshold1_S_From: s1From,
+      threshold1_S_To: s1To,
+      threshold1_V_From: v1From,
+      threshold1_V_To: v1To,
+      threshold2_H_From: h2From,
+      threshold2_H_To: h2To,
+      threshold2_S_From: s2From,
+      threshold2_S_To: s2To,
+      threshold2_V_From: v2From,
+      threshold2_V_To: v2To,
+      threshold3_H_From: h3From,
+      threshold3_H_To: h3To,
+      threshold3_S_From: s3From,
+      threshold3_S_To: s3To,
+      threshold3_V_From: v3From,
+      threshold3_V_To: v3To,
     };
 
     try {
-      const response = await api.post('/settings', payload);
+      const response = await api.post('/settings/ai', payload);
       console.log('Settings updated successfully:', response.data);
       setState({ ...state, open: true });
     } catch (error) {
@@ -184,7 +190,6 @@ export default function AI() {
               <p className="font-semibold">Number of Parts</p>
               <TextField
                 type="number"
-                // value={partCount}
                 value={partCount ?? ''}
                 onChange={(e) => {
                   setPartCount(Number(e.target.value));
@@ -229,6 +234,7 @@ export default function AI() {
                 className="w-52"
               />
             </div>
+
             <div>
               <p className="font-semibold">Padding Top</p>
               <TextField
@@ -285,123 +291,301 @@ export default function AI() {
 
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Main Slab Threshold:</p>
+              <p className="font-semibold">Object Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">H</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={h1}
-                    onChange={handleChangeH1}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 179 } }}
+                    size={'small'}
+                    type="number"
+                    value={h1From}
+                    onChange={(e) => {
+                      setH1From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 180 } }}
+                    size={'small'}
+                    type="number"
+                    value={h1To}
+                    onChange={(e) => {
+                      setH1To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">S</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={s1}
-                    onChange={handleChangeS1}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 254 } }}
+                    size={'small'}
+                    type="number"
+                    value={s1From}
+                    onChange={(e) => {
+                      setS1From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 255 } }}
+                    size={'small'}
+                    type="number"
+                    value={s1To}
+                    onChange={(e) => {
+                      setS1To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">V</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={v1}
-                    onChange={handleChangeV1}
-                    valueLabelDisplay="auto"
+
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v1From}
+                    onChange={(e) => {
+                      setV1From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v1To}
+                    onChange={(e) => {
+                      setV1To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Sub Slab Threshold:</p>
+              <p className="font-semibold">Horizontal Temperature Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">H</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={h2}
-                    onChange={handleChangeH2}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 179 } }}
+                    size={'small'}
+                    type="number"
+                    value={h2From}
+                    onChange={(e) => {
+                      setH2From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 180 } }}
+                    size={'small'}
+                    type="number"
+                    value={h2To}
+                    onChange={(e) => {
+                      setH2To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">S</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={s2}
-                    onChange={handleChangeS2}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 254 } }}
+                    size={'small'}
+                    type="number"
+                    value={s2From}
+                    onChange={(e) => {
+                      setS2From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 255 } }}
+                    size={'small'}
+                    type="number"
+                    value={s2To}
+                    onChange={(e) => {
+                      setS2To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">V</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={v2}
-                    onChange={handleChangeV2}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v2From}
+                    onChange={(e) => {
+                      setV2From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v2To}
+                    onChange={(e) => {
+                      setV2To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">Feature Detection Threshold:</p>
+              <p className="font-semibold">Zero Shot Threshold:</p>
               <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">H</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={h3}
-                    onChange={handleChangeH3}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 179 } }}
+                    size={'small'}
+                    type="number"
+                    value={h3From}
+                    onChange={(e) => {
+                      setH3From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 180 } }}
+                    size={'small'}
+                    type="number"
+                    value={h3To}
+                    onChange={(e) => {
+                      setH3To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">S</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={s3}
-                    onChange={handleChangeS3}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 254 } }}
+                    size={'small'}
+                    type="number"
+                    value={s3From}
+                    onChange={(e) => {
+                      setS3From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 255 } }}
+                    size={'small'}
+                    type="number"
+                    value={s3To}
+                    onChange={(e) => {
+                      setS3To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
 
-                <div className="flex gap-5">
+                <div className="flex items-center gap-5">
                   <p className="font-semibold">V</p>
-                  <Slider
-                    max={255}
-                    min={0}
-                    getAriaLabel={() => 'Temperature range'}
-                    value={v3}
-                    onChange={handleChangeV3}
-                    valueLabelDisplay="auto"
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v3From}
+                    onChange={(e) => {
+                      setV3From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v3To}
+                    onChange={(e) => {
+                      setV3To(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="font-semibold">Vertical Temperature Threshold:</p>
+              <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
+                <div className="flex items-center gap-5">
+                  <p className="font-semibold">H</p>
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 179 } }}
+                    size={'small'}
+                    type="number"
+                    value={h4From}
+                    onChange={(e) => {
+                      setH4From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 180 } }}
+                    size={'small'}
+                    type="number"
+                    value={h4To}
+                    onChange={(e) => {
+                      setH4To(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                </div>
+
+                <div className="flex items-center gap-5">
+                  <p className="font-semibold">S</p>
+                  <TextField
+                    InputProps={{ inputProps: { min: 0, max: 254 } }}
+                    size={'small'}
+                    type="number"
+                    value={s4From}
+                    onChange={(e) => {
+                      setS4From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    InputProps={{ inputProps: { min: 1, max: 255 } }}
+                    size={'small'}
+                    type="number"
+                    value={s4To}
+                    onChange={(e) => {
+                      setS4To(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                </div>
+
+                <div className="flex items-center gap-5">
+                  <p className="font-semibold">V</p>
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v4From}
+                    onChange={(e) => {
+                      setV4From(Number(e.target.value));
+                    }}
+                    className="w-52"
+                  />
+                  <TextField
+                    size={'small'}
+                    type="number"
+                    value={v4To}
+                    onChange={(e) => {
+                      setV4To(Number(e.target.value));
+                    }}
+                    className="w-52"
                   />
                 </div>
               </div>

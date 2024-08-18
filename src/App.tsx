@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import LayoutsWithNavbar from './components/LayoutsWithNavbar';
+import SlabDetails from './components/Reports/SlabDetails';
 import AI from './pages/AI';
 import Calibration from './pages/Calibration';
 import Dashboard from './pages/Dashboard';
@@ -32,6 +33,7 @@ export default function App() {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/pages" element={<Pages />} />
                   <Route path="/reports" element={<Reports />} />
+                  <Route path="/reports/:slabNo" element={<SlabDetails />} />
                   <Route path="/ai" element={<AI />} />
                   <Route path="/calibration" element={<Calibration />} />
                   <Route path="/export" element={<Export />} />
