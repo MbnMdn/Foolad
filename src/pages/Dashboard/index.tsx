@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import DashboardSelectSection from '../components/Dashboard/DashboardSelectSection';
-import PictureSection from '../components/Dashboard/PictureSection';
-import TemperatureSection from '../components/Dashboard/TemperatureSection';
-import api from '../scripts/api';
+import api from '../../scripts/api';
+import DashboardSelectSection from './components/DashboardSelectSection';
+import PictureSection from './components/PictureSection';
+import TemperatureSection from './components/TemperatureSection';
 
-const Dashboard: React.FC = () => {
+const Index: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dataRecordOn, setDataRecordOn] = useState<boolean>(true);
@@ -18,8 +18,7 @@ const Dashboard: React.FC = () => {
         params: {},
       });
 
-      const fetchedData = response?.data;
-      setData(fetchedData);
+      setData(response?.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -57,24 +56,23 @@ const Dashboard: React.FC = () => {
 
   if (loading) return <div>Loading...</div>;
 
-  return (
-    <div className="flex flex-col gap-5">
-      <DashboardSelectSection
-        dataRecordOn={dataRecordOn}
-        setDataRecordOn={setDataRecordOn}
-        pictureTypeOn={pictureTypeOn}
-        setPictureTypeOn={setPictureTypeOn}
-        pollingOn={pollingOn}
-        setPollingOn={setPollingOn}
-      />
-      <PictureSection
-        dataRecordOn={dataRecordOn}
-        pictureTypeOn={pictureTypeOn}
-        pollingOn={pollingOn}
-        response={data}
-      />
-      <TemperatureSection response={data} />
-    </div>
-  );
+  if (!loading)
+    return (
+      <div className="flex flex-col gap-5">
+        <DashboardSelectSection
+          pictureTypeOn={pictureTypeOn}
+          setPictureTypeOn={setPictureTypeOn}
+          pollingOn={pollingOn}
+          setPollingOn={setPollingOn}
+        />
+        <PictureSection
+          dataRecordOn={dataRecordOn}
+          pictureTypeOn={pictureTypeOn}
+          pollingOn={pollingOn}
+          response={data}
+        />
+        <TemperatureSection response={data} />
+      </div>
+    );
 };
-export default Dashboard;
+export default Index;

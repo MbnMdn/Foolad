@@ -1,623 +1,322 @@
-import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
-import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
-import TextField from '@mui/material/TextField';
+import { Alert, Button, Snackbar, SnackbarCloseReason, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 
 import api from '../scripts/api';
 
-interface State {
+interface SnackbarState {
   open: boolean;
   vertical: 'top' | 'bottom';
   horizontal: 'left' | 'center' | 'right';
 }
 
+interface Padding {
+  top: number;
+  bottom: number;
+  right: number;
+  left: number;
+}
+
+interface Threshold {
+  H: [number, number];
+  S: [number, number];
+  V: [number, number];
+}
+
+interface AISettingsData {
+  part_count: number;
+  N1: number;
+  N2: number;
+  sigma: number;
+  paddings: Padding;
+  obj_thresh: Threshold;
+  horizontal_temp_thresh: Threshold;
+  zero_shot_thresh: Threshold;
+  vertical_temp_thresh: Threshold;
+}
+
+const initialSnackbarState: SnackbarState = {
+  open: false,
+  vertical: 'bottom',
+  horizontal: 'right',
+};
+
 export default function AI() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<AISettingsData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const [state, setState] = useState<State>({
-    open: false,
-    vertical: 'bottom',
-    horizontal: 'right',
-  });
-  const { vertical, horizontal, open } = state;
-
-  const [partCount, setPartCount] = useState<number | undefined>(undefined);
-  const [n1, setN1] = useState<number>(0);
-  const [n2, setN2] = useState<number>(0);
-  const [sigma, setSigma] = useState<number>(0);
-
-  const [paddingTop, setPaddingTop] = useState<number>(0);
-  const [paddingBottom, setPaddingBottom] = useState<number>(0);
-  const [paddingRight, setPaddingRight] = useState<number>(0);
-  const [paddingLeft, setPaddingLeft] = useState<number>(0);
-
-  const [paddingTopX100, setPaddingTopX100] = useState<number>(0);
-  const [paddingBottomX100, setPaddingBottomX100] = useState<number>(0);
-  const [paddingRightX100, setPaddingRightX100] = useState<number>(0);
-  const [paddingLeftX100, setPaddingLeftX100] = useState<number>(0);
-
-  const [h1From, setH1From] = useState<number>(0);
-  const [h1To, setH1To] = useState<number>(0);
-  const [s1From, setS1From] = useState<number>(0);
-  const [s1To, setS1To] = useState<number>(0);
-  const [v1From, setV1From] = useState<number>(0);
-  const [v1To, setV1To] = useState<number>(0);
-
-  const [h2From, setH2From] = useState<number>(0);
-  const [h2To, setH2To] = useState<number>(0);
-  const [s2From, setS2From] = useState<number>(0);
-  const [s2To, setS2To] = useState<number>(0);
-  const [v2From, setV2From] = useState<number>(0);
-  const [v2To, setV2To] = useState<number>(0);
-
-  const [h3From, setH3From] = useState<number>(0);
-  const [h3To, setH3To] = useState<number>(0);
-  const [s3From, setS3From] = useState<number>(0);
-  const [s3To, setS3To] = useState<number>(0);
-  const [v3From, setV3From] = useState<number>(0);
-  const [v3To, setV3To] = useState<number>(0);
-
-  const [h4From, setH4From] = useState<number>(0);
-  const [h4To, setH4To] = useState<number>(0);
-  const [s4From, setS4From] = useState<number>(0);
-  const [s4To, setS4To] = useState<number>(0);
-  const [v4From, setV4From] = useState<number>(0);
-  const [v4To, setV4To] = useState<number>(0);
-  const fetchData = async () => {
-    try {
-      const response = await api.get('/settings/ai', {
-        params: {},
-      });
-
-      const fetchedData = response.data;
-
-      setData(fetchedData);
-      console.log(fetchedData);
-
-      setPartCount(fetchedData?.settings_data?.part_count);
-      setN1(fetchedData?.settings_data?.N1);
-      setN2(fetchedData?.settings_data?.N2);
-      setSigma(fetchedData?.settings_data?.sigma);
-
-      setPaddingTop(fetchedData?.settings_data?.paddings.top);
-      setPaddingBottom(fetchedData?.settings_data?.paddings.bottom);
-      setPaddingRight(fetchedData?.settings_data?.paddings.right);
-      setPaddingLeft(fetchedData?.settings_data?.paddings.left);
-
-      setPaddingTopX100(fetchedData?.settings_data?.paddings.top * 100);
-      setPaddingBottomX100(fetchedData?.settings_data?.paddings.bottom * 100);
-      setPaddingRightX100(fetchedData?.settings_data?.paddings.right * 100);
-      setPaddingLeftX100(fetchedData?.settings_data?.paddings.left * 100);
-
-      setH1From(fetchedData?.settings_data?.obj_thresh?.H[0]);
-      setH1To(fetchedData?.settings_data?.obj_thresh?.H[1]);
-      setS1From(fetchedData?.settings_data?.obj_thresh?.S[0]);
-      setS1To(fetchedData?.settings_data?.obj_thresh?.S[1]);
-      setV1From(fetchedData?.settings_data?.obj_thresh?.V[0]);
-      setV1To(fetchedData?.settings_data?.obj_thresh?.V[1]);
-
-      setH2From(fetchedData?.settings_data?.horizontal_temp_thresh?.H[0]);
-      setH2To(fetchedData?.settings_data?.horizontal_temp_thresh?.H[1]);
-      setS2From(fetchedData?.settings_data?.horizontal_temp_thresh?.S[0]);
-      setS2To(fetchedData?.settings_data?.horizontal_temp_thresh?.S[1]);
-      setV2From(fetchedData?.settings_data?.horizontal_temp_thresh?.V[0]);
-      setV2To(fetchedData?.settings_data?.horizontal_temp_thresh?.V[1]);
-
-      setH3From(fetchedData?.settings_data?.zero_shot_thresh?.H[0]);
-      setH3To(fetchedData?.settings_data?.zero_shot_thresh?.H[1]);
-      setS3From(fetchedData?.settings_data?.zero_shot_thresh?.S[0]);
-      setS3To(fetchedData?.settings_data?.zero_shot_thresh?.S[1]);
-      setV3From(fetchedData?.settings_data?.zero_shot_thresh?.V[0]);
-      setV3To(fetchedData?.settings_data?.zero_shot_thresh?.V[1]);
-
-      setH4From(fetchedData?.settings_data?.vertical_temp_thresh?.H[0]);
-      setH4To(fetchedData?.settings_data?.vertical_temp_thresh?.H[1]);
-      setS4From(fetchedData?.settings_data?.vertical_temp_thresh?.S[0]);
-      setS4To(fetchedData?.settings_data?.vertical_temp_thresh?.S[1]);
-      setV4From(fetchedData?.settings_data?.vertical_temp_thresh?.V[0]);
-      setV4To(fetchedData?.settings_data?.vertical_temp_thresh?.V[1]);
-
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false);
-    }
-  };
+  const [snackbarState, setSnackbarState] = useState(initialSnackbarState);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await api.get('/settings/ai');
+        const fetchedData: AISettingsData = response.data.settings_data;
+        setData(fetchedData);
+        console.log(fetchedData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
     fetchData();
   }, []);
 
+  const handleInputChange = (
+    field: keyof AISettingsData,
+    value: number | Padding | Threshold,
+  ) => {
+    setData((prevData) => (prevData ? { ...prevData, [field]: value } : prevData));
+  };
+
+  const handleThresholdChange = (
+    field: keyof AISettingsData,
+    subField: keyof Threshold,
+    index: number,
+    value: number,
+  ) => {
+    setData((prevData) =>
+      prevData
+        ? {
+            ...prevData,
+            [field]: {
+              // @ts-ignore
+              ...prevData[field],
+              // @ts-ignore
+              [subField]: prevData[field][subField].map((val, i) =>
+                i === index ? value : val,
+              ) as [number, number],
+            },
+          }
+        : prevData,
+    );
+  };
+
   const handleSubmit = async () => {
+    if (!data) return;
     const payload = {
-      part_count: partCount,
-      padding_top: paddingTop,
-      padding_bottom: paddingBottom,
-      padding_right: paddingRight,
-      padding_left: paddingLeft,
-      N1: n1,
-      N2: n2,
-      sigma: sigma,
-      threshold1_H_From: h1From,
-      threshold1_H_To: h1To,
-      threshold1_S_From: s1From,
-      threshold1_S_To: s1To,
-      threshold1_V_From: v1From,
-      threshold1_V_To: v1To,
-      threshold2_H_From: h2From,
-      threshold2_H_To: h2To,
-      threshold2_S_From: s2From,
-      threshold2_S_To: s2To,
-      threshold2_V_From: v2From,
-      threshold2_V_To: v2To,
-      threshold3_H_From: h3From,
-      threshold3_H_To: h3To,
-      threshold3_S_From: s3From,
-      threshold3_S_To: s3To,
-      threshold3_V_From: v3From,
-      threshold3_V_To: v3To,
+      part_count: data?.part_count,
+      padding_top: data?.paddings.top,
+      padding_bottom: data?.paddings.bottom,
+      padding_right: data?.paddings.right,
+      padding_left: data?.paddings.left,
+      N1: data?.N1,
+      N2: data?.N2,
+      sigma: data?.sigma,
+      threshold_obj_H_From: data?.obj_thresh.H[0],
+      threshold_obj_H_To: data?.obj_thresh.H[1],
+      threshold_obj_S_From: data?.obj_thresh.S[0],
+      threshold_obj_S_To: data?.obj_thresh.S[1],
+      threshold_obj_V_From: data?.obj_thresh.V[0],
+      threshold_obj_V_To: data?.obj_thresh.V[1],
+
+      threshold_vertical_temp_H_From: data?.vertical_temp_thresh.H[0],
+      threshold_vertical_temp_H_To: data?.vertical_temp_thresh.H[1],
+      threshold_vertical_temp_S_From: data?.vertical_temp_thresh.S[0],
+      threshold_vertical_temp_S_To: data?.vertical_temp_thresh.S[1],
+      threshold_vertical_temp_V_From: data?.vertical_temp_thresh.V[0],
+      threshold_vertical_temp_V_To: data?.vertical_temp_thresh.V[1],
+
+      threshold_horizontal_temp_H_From: data?.horizontal_temp_thresh.H[0],
+      threshold_horizontal_temp_H_To: data?.horizontal_temp_thresh.H[1],
+      threshold_horizontal_temp_S_From: data?.horizontal_temp_thresh.S[0],
+      threshold_horizontal_temp_S_To: data?.horizontal_temp_thresh.S[1],
+      threshold_horizontal_temp_V_From: data?.horizontal_temp_thresh.V[0],
+      threshold_horizontal_temp_V_To: data?.horizontal_temp_thresh.V[1],
+
+      threshold_zero_shot_H_From: data?.zero_shot_thresh.H[0],
+      threshold_zero_shot_H_To: data?.zero_shot_thresh.H[1],
+      threshold_zero_shot_S_From: data?.zero_shot_thresh.S[0],
+      threshold_zero_shot_S_To: data?.zero_shot_thresh.S[1],
+      threshold_zero_shot_V_From: data?.zero_shot_thresh.V[0],
+      threshold_zero_shot_V_To: data?.zero_shot_thresh.V[1],
     };
 
     try {
       const response = await api.post('/settings/ai', payload);
+      console.log('post');
       console.log('Settings updated successfully:', response.data);
-      setState({ ...state, open: true });
+      setSnackbarState({ ...snackbarState, open: true });
     } catch (error) {
       console.error('Error updating settings:', error);
     }
   };
 
-  const handleClose = (
+  const handleCloseSnackbar = (
     event?: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason,
   ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setState({ ...state, open: false });
+    if (reason === 'clickaway') return;
+    setSnackbarState({ ...snackbarState, open: false });
   };
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      {!loading && (
-        <div className="flex flex-col gap-10">
-          <div className="grid grid-cols-1 gap-10 min-[600px]:grid-cols-2 min-[1030px]:grid-cols-3 min-[1400px]:grid-cols-4">
-            <div>
-              <p className="font-semibold">Number of Parts</p>
-              <TextField
-                type="number"
-                value={partCount ?? ''}
-                onChange={(e) => {
-                  setPartCount(Number(e.target.value));
-                }}
-                size={'small'}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Edge Detection Min Pixel</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={n1}
-                onChange={(e) => {
-                  setN1(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Region Detection Min Pixel</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={n2}
-                onChange={(e) => {
-                  setN2(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Gaussian Kernel Size</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={sigma}
-                onChange={(e) => {
-                  setSigma(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
+    <div className="flex flex-col gap-10">
+      <div className="grid grid-cols-1 gap-10 min-[600px]:grid-cols-2 min-[1030px]:grid-cols-3 min-[1400px]:grid-cols-4">
+        <SettingInput
+          label="Number of Parts"
+          value={data?.part_count}
+          onChange={(value) => handleInputChange('part_count', value)}
+        />
+        <SettingInput
+          label="Edge Detection Min Pixel"
+          value={data?.N1}
+          onChange={(value) => handleInputChange('N1', value)}
+        />
+        <SettingInput
+          label="Region Detection Min Pixel"
+          value={data?.N2}
+          onChange={(value) => handleInputChange('N2', value)}
+        />
+        <SettingInput
+          label="Gaussian Kernel Size"
+          value={data?.sigma}
+          onChange={(value) => handleInputChange('sigma', value)}
+        />
+        <PaddingInput
+          label="Padding"
+          padding={data?.paddings}
+          onChange={(value) => handleInputChange('paddings', value)}
+        />
+      </div>
 
-            <div>
-              <p className="font-semibold">Padding Top</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={paddingTopX100}
-                onChange={(e) => {
-                  setPaddingTop(Number(e.target.value) / 100);
-                  setPaddingTopX100(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Padding Bottom</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={paddingBottomX100}
-                onChange={(e) => {
-                  setPaddingBottom(Number(e.target.value) / 100);
-                  setPaddingBottomX100(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Padding Right</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={paddingRightX100}
-                onChange={(e) => {
-                  setPaddingRight(Number(e.target.value) / 100);
-                  setPaddingRightX100(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-            <div>
-              <p className="font-semibold">Padding Left</p>
-              <TextField
-                size={'small'}
-                type="number"
-                value={paddingLeftX100}
-                onChange={(e) => {
-                  setPaddingLeft(Number(e.target.value) / 100);
-                  setPaddingLeftX100(Number(e.target.value));
-                }}
-                className="w-52"
-              />
-            </div>
-          </div>
+      <div className="flex flex-col gap-10">
+        <ThresholdInput
+          label="Object Threshold"
+          threshold={data?.obj_thresh}
+          onChange={(subField, index, value) =>
+            handleThresholdChange('obj_thresh', subField, index, value)
+          }
+        />
+        <ThresholdInput
+          label="Horizontal Temperature Threshold"
+          threshold={data?.horizontal_temp_thresh}
+          onChange={(subField, index, value) =>
+            handleThresholdChange('horizontal_temp_thresh', subField, index, value)
+          }
+        />
+        <ThresholdInput
+          label="Zero Shot Threshold"
+          threshold={data?.zero_shot_thresh}
+          onChange={(subField, index, value) =>
+            handleThresholdChange('zero_shot_thresh', subField, index, value)
+          }
+        />
+        <ThresholdInput
+          label="Vertical Temperature Threshold"
+          threshold={data?.vertical_temp_thresh}
+          onChange={(subField, index, value) =>
+            handleThresholdChange('vertical_temp_thresh', subField, index, value)
+          }
+        />
+      </div>
 
-          <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">Object Threshold:</p>
-              <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">H</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 179 } }}
-                    size={'small'}
-                    type="number"
-                    value={h1From}
-                    onChange={(e) => {
-                      setH1From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 180 } }}
-                    size={'small'}
-                    type="number"
-                    value={h1To}
-                    onChange={(e) => {
-                      setH1To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
+      <Button variant="contained" color="primary" onClick={handleSubmit}>
+        Submit
+      </Button>
 
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">S</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 254 } }}
-                    size={'small'}
-                    type="number"
-                    value={s1From}
-                    onChange={(e) => {
-                      setS1From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 255 } }}
-                    size={'small'}
-                    type="number"
-                    value={s1To}
-                    onChange={(e) => {
-                      setS1To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">V</p>
-
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v1From}
-                    onChange={(e) => {
-                      setV1From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v1To}
-                    onChange={(e) => {
-                      setV1To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">Horizontal Temperature Threshold:</p>
-              <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">H</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 179 } }}
-                    size={'small'}
-                    type="number"
-                    value={h2From}
-                    onChange={(e) => {
-                      setH2From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 180 } }}
-                    size={'small'}
-                    type="number"
-                    value={h2To}
-                    onChange={(e) => {
-                      setH2To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">S</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 254 } }}
-                    size={'small'}
-                    type="number"
-                    value={s2From}
-                    onChange={(e) => {
-                      setS2From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 255 } }}
-                    size={'small'}
-                    type="number"
-                    value={s2To}
-                    onChange={(e) => {
-                      setS2To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">V</p>
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v2From}
-                    onChange={(e) => {
-                      setV2From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v2To}
-                    onChange={(e) => {
-                      setV2To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">Zero Shot Threshold:</p>
-              <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">H</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 179 } }}
-                    size={'small'}
-                    type="number"
-                    value={h3From}
-                    onChange={(e) => {
-                      setH3From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 180 } }}
-                    size={'small'}
-                    type="number"
-                    value={h3To}
-                    onChange={(e) => {
-                      setH3To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">S</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 254 } }}
-                    size={'small'}
-                    type="number"
-                    value={s3From}
-                    onChange={(e) => {
-                      setS3From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 255 } }}
-                    size={'small'}
-                    type="number"
-                    value={s3To}
-                    onChange={(e) => {
-                      setS3To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">V</p>
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v3From}
-                    onChange={(e) => {
-                      setV3From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v3To}
-                    onChange={(e) => {
-                      setV3To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <p className="font-semibold">Vertical Temperature Threshold:</p>
-              <div className="grid grid-cols-1 gap-3 min-[1000px]:grid-cols-3 min-[1000px]:gap-20">
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">H</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 179 } }}
-                    size={'small'}
-                    type="number"
-                    value={h4From}
-                    onChange={(e) => {
-                      setH4From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 180 } }}
-                    size={'small'}
-                    type="number"
-                    value={h4To}
-                    onChange={(e) => {
-                      setH4To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">S</p>
-                  <TextField
-                    InputProps={{ inputProps: { min: 0, max: 254 } }}
-                    size={'small'}
-                    type="number"
-                    value={s4From}
-                    onChange={(e) => {
-                      setS4From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    InputProps={{ inputProps: { min: 1, max: 255 } }}
-                    size={'small'}
-                    type="number"
-                    value={s4To}
-                    onChange={(e) => {
-                      setS4To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <p className="font-semibold">V</p>
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v4From}
-                    onChange={(e) => {
-                      setV4From(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                  <TextField
-                    size={'small'}
-                    type="number"
-                    value={v4To}
-                    onChange={(e) => {
-                      setV4To(Number(e.target.value));
-                    }}
-                    className="w-52"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Button
-            className="w-44 self-center"
-            type={'submit'}
-            variant="contained"
-            onClick={handleSubmit}
-          >
-            Update
-          </Button>
-          <Snackbar
-            anchorOrigin={{ vertical, horizontal }}
-            open={open}
-            onClose={handleClose}
-            key={vertical + horizontal}
-            autoHideDuration={3000}
-          >
-            <Alert
-              onClose={handleClose}
-              severity="success"
-              variant="filled"
-              sx={{ width: '100%' }}
-            >
-              Updated Successfully
-            </Alert>
-          </Snackbar>
-        </div>
-      )}
+      <Snackbar
+        anchorOrigin={{
+          vertical: snackbarState.vertical,
+          horizontal: snackbarState.horizontal,
+        }}
+        open={snackbarState.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          Settings updated successfully!
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
+
+interface SettingInputProps {
+  label: string;
+  value?: number;
+  onChange: (value: number) => void;
+}
+
+const SettingInput: React.FC<SettingInputProps> = ({ label, value, onChange }) => (
+  <div>
+    <p className="font-semibold">{label}</p>
+    <TextField
+      type="number"
+      value={value ?? ''}
+      onChange={(e) => onChange(Number(e.target.value))}
+      size="small"
+      className="w-52"
+    />
+  </div>
+);
+
+interface PaddingInputProps {
+  label: string;
+  padding?: Padding;
+  onChange: (value: Padding) => void;
+}
+
+const PaddingInput: React.FC<PaddingInputProps> = ({ label, padding, onChange }) => {
+  const handlePaddingChange = (side: keyof Padding, value: number) => {
+    onChange({ ...padding, [side]: value / 100 } as Padding);
+  };
+
+  return (
+    <>
+      {/*<p className="font-semibold">{label}</p>*/}
+      {['top', 'bottom', 'right', 'left'].map((side) => (
+        <div key={side}>
+          <p className="font-semibold">
+            Padding {side.charAt(0).toUpperCase() + side.slice(1)}
+          </p>
+          <TextField
+            size="small"
+            type="number"
+            value={padding ? padding[side as keyof Padding] * 100 : ''}
+            onChange={(e) =>
+              handlePaddingChange(side as keyof Padding, Number(e.target.value))
+            }
+            className="w-52"
+          />
+        </div>
+      ))}
+    </>
+  );
+};
+
+interface ThresholdInputProps {
+  label: string;
+  threshold?: Threshold;
+  onChange: (subField: keyof Threshold, index: number, value: number) => void;
+}
+
+const ThresholdInput: React.FC<ThresholdInputProps> = ({
+  label,
+  threshold,
+  onChange,
+}) => (
+  <div className="flex flex-col gap-4">
+    <p className="font-semibold">{label}:</p>
+    <div className="flex gap-20">
+      {['H', 'S', 'V'].map((subField) => (
+        <div className="flex items-center gap-2" key={subField}>
+          <p className="font-semibold">{subField}</p>
+          {[0, 1].map((index) => (
+            <TextField
+              key={index}
+              size="small"
+              type="number"
+              label={index ? 'To' : 'From'}
+              value={threshold ? threshold[subField as keyof Threshold][index] : ''}
+              onChange={(e) =>
+                onChange(subField as keyof Threshold, index, Number(e.target.value))
+              }
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+);

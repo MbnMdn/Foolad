@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import api from '../../scripts/api';
 import Table from '../Table';
+import { Button } from "@mui/material";
 
 interface TableDataItem {
   parameter: string;
@@ -146,9 +147,9 @@ export default function SettingsTable() {
   ];
 
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       <Table columns={columns} data={data} />
-      <button onClick={handleSubmit}>Submit</button>
+      <Button className="self-center" variant="contained" color="primary" onClick={handleSubmit}>Submit</Button>
     </div>
   );
 }

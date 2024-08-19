@@ -1,4 +1,4 @@
-import BasicLineChart from '../Charts/BasicLineChart';
+import BasicLineChart from '../../../components/Charts/BasicLineChart';
 
 export default function TemperatureSection({ response }: { response: any }) {
   return (
