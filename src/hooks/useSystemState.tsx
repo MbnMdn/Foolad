@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import api from '../../../scripts/api';
+import api from '../scripts/api';
+import { endPoints } from '../scripts/endPoints';
 
 const useSystemState = () => {
   const [dataRecordOn, setDataRecordOn] = useState<boolean>(false);
@@ -8,7 +9,7 @@ const useSystemState = () => {
   useEffect(() => {
     const fetchInitialState = async () => {
       try {
-        const req = await api.get('/system_state/', { params: {} });
+        const req = await api.get(endPoints.settings_system_state, { params: {} });
         setDataRecordOn(req?.data?.state);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -22,7 +23,7 @@ const useSystemState = () => {
 
   const updateDataRecordState = async (newState: boolean) => {
     try {
-      const req = await api.post('/system_state/', { params: {} });
+      const req = await api.post(endPoints.settings_system_state, { params: {} });
       setDataRecordOn(req?.data?.state);
     } catch (error) {
       console.error('Error fetching data:', error);

@@ -1,10 +1,12 @@
-import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
+
+import DimensionSection from './DimensionSection';
+import SlabDetectionSection from './SlabDetectionSection';
+import TemperatureSection from './TemperatureSection';
 
 export default function CalibrationSelectSection() {
   const [selectedOption, setSelectedOption] = useState('slabDetection');
@@ -39,56 +41,11 @@ export default function CalibrationSelectSection() {
         </FormControl>
       </div>
 
-      {selectedOption === 'slabDetection' && (
-        <div className="flex gap-10">
-          <TextField
-            size={'small'}
-            label="Minimum Intensity"
-            type="number"
-            className="w-52"
-          />
+      {selectedOption === 'slabDetection' && <SlabDetectionSection />}
 
-          <Button className="w-24" variant="contained">
-            Test
-          </Button>
-        </div>
-      )}
+      {selectedOption === 'temperature' && <TemperatureSection />}
 
-      {selectedOption === 'temperature' && (
-        <div className="flex flex-col gap-10 md:flex-row">
-          <TextField
-            size={'small'}
-            label="Edge Distance"
-            type="number"
-            className="w-52"
-          />
-          <TextField
-            size={'small'}
-            label="Max Temperature"
-            type="number"
-            className="w-52"
-          />
-
-          <Button className="w-52" variant="contained">
-            Data Acquisition
-          </Button>
-        </div>
-      )}
-
-      {selectedOption === 'dimension' && (
-        <div className="flex gap-10">
-          <TextField
-            size={'small'}
-            label="Minimum Intensity"
-            type="number"
-            className="w-52"
-          />
-
-          <Button className="w-24" variant="contained">
-            Test
-          </Button>
-        </div>
-      )}
+      {selectedOption === 'dimension' && <DimensionSection />}
     </>
   );
 }

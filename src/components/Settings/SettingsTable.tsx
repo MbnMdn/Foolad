@@ -1,8 +1,10 @@
+import { Button } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import api from '../../scripts/api';
+import { endPoints } from '../../scripts/endPoints';
 import Table from '../Table';
-import { Button } from "@mui/material";
 
 interface TableDataItem {
   parameter: string;
@@ -28,13 +30,15 @@ interface Payload {
 export default function SettingsTable() {
   const [data, setData] = useState<TableDataItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState();
+
   const [editedData, setEditedData] = useState<Record<string, string | number | boolean>>(
     {},
   );
 
   const fetchData = async () => {
     try {
-      const response = await api.get('/settings/camera/', { params: {} });
+      const response = await api.get(endPoints.settings_camera, { params: {} });
       const fetchedData = response?.data?.settings_data;
 
       const transformedData: TableDataItem[] = Object.keys(fetchedData).map((key) => ({
@@ -52,6 +56,9 @@ export default function SettingsTable() {
       setEditedData(fetchedData);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      setError('- Error - ' + error);
     } finally {
       setLoading(false);
     }
@@ -85,7 +92,7 @@ export default function SettingsTable() {
     };
 
     try {
-      const response = await api.post('/settings/camera', payload);
+      const response = await api.post(endPoints.settings_camera, payload);
       console.log('Settings updated successfully:', response.data);
 
       fetchData();
@@ -94,13 +101,9 @@ export default function SettingsTable() {
     }
   };
 
-  if (loading) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading...</div>;
+
+  if (error) return <div>{error}</div>;
 
   const columns = [
     { header: 'Parameter', accessor: 'parameter' },
@@ -125,8 +128,31 @@ export default function SettingsTable() {
         }
 
         return (
-          <input
+          // <input
+          //   type="text"
+          //   value={
+          //     typeof editedData[row.originalKey] === 'boolean'
+          //       ? editedData[row.originalKey]
+          //         ? 'on'
+          //         : 'off'
+          //       : editedData[row.originalKey]?.toString() ?? row.value
+          //   }
+          //   readOnly={isReadonly}
+          //   onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          //     if (!isReadonly) {
+          //       handleChange(row.originalKey, e.target.value);
+          //     }
+          //   }}
+          // />
+          <TextField
+            size={'small'}
             type="text"
+            disabled={isReadonly}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              if (!isReadonly) {
+                handleChange(row.originalKey, e.target.value);
+              }
+            }}
             value={
               typeof editedData[row.originalKey] === 'boolean'
                 ? editedData[row.originalKey]
@@ -134,12 +160,6 @@ export default function SettingsTable() {
                   : 'off'
                 : editedData[row.originalKey]?.toString() ?? row.value
             }
-            readOnly={isReadonly}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              if (!isReadonly) {
-                handleChange(row.originalKey, e.target.value);
-              }
-            }}
           />
         );
       },
@@ -149,7 +169,14 @@ export default function SettingsTable() {
   return (
     <div className="flex flex-col gap-3">
       <Table columns={columns} data={data} />
-      <Button className="self-center" variant="contained" color="primary" onClick={handleSubmit}>Submit</Button>
+      <Button
+        className="self-center"
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+      >
+        Submit
+      </Button>
     </div>
   );
 }

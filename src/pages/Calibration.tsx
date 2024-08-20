@@ -8,8 +8,6 @@ export default function Calibration() {
   return (
     <div className="flex flex-col gap-5">
       <CalibrationSelectSection />
-      <RawPictureSection />
-      <CroppedPictureSection />
     </div>
   );
 }

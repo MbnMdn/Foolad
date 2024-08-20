@@ -1,7 +1,7 @@
 import React from 'react';
 
-import ToggleSwitch from '../../../components/ui/ToggleSwitch';
-import useSystemState from '../hooks/useSystemState';
+import ToggleSwitch from '../ui/ToggleSwitch';
+import useSystemState from '../../hooks/useSystemState';
 
 interface DashboardSelectSectionProps {
   pictureTypeOn: boolean;

@@ -2,37 +2,63 @@ import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import React, { useEffect, useState } from 'react';
 
 import api from '../../scripts/api';
+import { endPoints } from '../../scripts/endPoints';
 import DimensionSection from './DimensionSection';
 
 export default function ReportSelectSection() {
-  const [selectedOption, setSelectedOption] = useState('dimension');
+  const [data, setData] = useState<{
+    slabs: { slabNo: string; width: number; length: number; details: string }[];
+    lengthChart: any;
+    widthChart: any;
+  }>({
+    slabs: [],
+    lengthChart: null,
+    widthChart: null,
+  });
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = useState();
+  const [dataCount, setDataCount] = useState(-1);
 
-  const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSelectedOption(event.target.value);
+  const [filterButton, setFilterButton] = useState('Filter');
+  const [date, setDate] = React.useState<Dayjs | null>(dayjs('2024-08-10'));
+  const [fromTime, setFromTime] = React.useState<Dayjs | null>(dayjs('2024-08-10T15:30'));
+  const [toTime, setToTime] = React.useState<Dayjs | null>(dayjs('2024-08-10T16:30'));
+  const [fromDateString, setFromDateString] = React.useState('2024-08-10T15:30:00.000Z');
+  const [toDateString, setToDateString] = React.useState('2024-08-10T16:30:00.000Z');
+
+  const updateDateTimeStrings = () => {
+    if (date && fromTime) {
+      const combinedFromDate = dayjs(date)
+        .hour(fromTime.hour())
+        .minute(fromTime.minute())
+        .second(0)
+        .millisecond(0);
+
+      const fromDateString = combinedFromDate.format('YYYY-MM-DDTHH:mm:ss'); // local time format
+      setFromDateString(fromDateString);
+    }
+
+    if (date && toTime) {
+      const combinedToDate = dayjs(date)
+        .hour(toTime.hour())
+        .minute(toTime.minute())
+        .second(0)
+        .millisecond(0);
+      const fromDateString = combinedToDate.format('YYYY-MM-DDTHH:mm:ss'); // local time format
+      setToDateString(fromDateString);
+    }
   };
 
-  const [data, setData] = useState([]);
-
-  const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17T15:30'));
-
-  const [fromDate, setFromDate] = React.useState<Dayjs | null>(dayjs('2024-08-10'));
-  const [fromDateString, setFromDateSting] = React.useState('2024-08-10T20:30:00.000Z');
-
-  const [toDate, setToDate] = React.useState<Dayjs | null>(dayjs('2024-08-15'));
-  const [toDateString, setToDateString] = React.useState('2024-08-15T20:30:00.000Z');
-
-  const [loading, setLoading] = React.useState(true);
-
   const fetchData = async () => {
+    setFilterButton('Filter...');
     try {
-      const response = await api.get('/get_slabs', {
+      const response = await api.get(endPoints.slabs, {
         params: {
           page: 1,
           limit: 100,
@@ -41,22 +67,43 @@ export default function ReportSelectSection() {
         },
       });
 
-      const fetchedData = response.data.data.map((item: any, index: number) => ({
-        slabNo: item.id,
-        width: item.slab_metadata.Width,
-        length: item.slab_metadata.Length,
-        details: 'show',
-      }));
+      setDataCount(response.data.slabs.data_count);
+      console.log(dataCount);
+      if (dataCount !== 0) {
+        const fetchedData = {
+          slabs: response.data.slabs.data.map((item: any, index: number) => ({
+            slabNo: item.id,
+            width: item.slab_metadata.Width,
+            length: item.slab_metadata.Length,
+            details: 'show',
+          })),
+          lengthChart: response?.data?.charts?.Length_Chart,
+          widthChart: response?.data?.charts?.Width_Chart,
+        };
 
-      setData(fetchedData);
+        setData(fetchedData);
+      }
+
+      setFilterButton('Filter');
     } catch (error) {
       console.error('Error fetching data:', error);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      setError('- Error - ' + error);
     }
   };
 
   useEffect(() => {
+    updateDateTimeStrings();
+  }, [date, fromTime, toTime]);
+
+  useEffect(() => {
     fetchData().then(() => setLoading(false));
   }, []);
+
+  if (loading) return <div>Loading...</div>;
+
+  if (error) return <div>{error}</div>;
 
   return (
     <>
@@ -64,56 +111,43 @@ export default function ReportSelectSection() {
         <FormControl className="flex flex-col gap-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:gap-5">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DatePicker']}>
-                <DatePicker
-                  className="w-28"
-                  label="from"
-                  value={fromDate}
-                  onChange={(newValue) => {
-                    setFromDate(newValue);
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    setFromDateSting(newValue?.$d.toJSON());
-                  }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
+              <DatePicker
+                label="From Date"
+                value={date}
+                onChange={(newValue) => setDate(newValue)}
+              />
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DatePicker']}>
-                <DatePicker
-                  className="w-28"
-                  label="to"
-                  value={toDate}
-                  onChange={(newValue) => {
-                    setToDate(newValue);
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    setToDateString(newValue?.$d.toJSON());
-                  }}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
+              <TimePicker
+                label="From Time"
+                value={fromTime}
+                onChange={(newValue) => {
+                  setFromTime(newValue);
+                }}
+              />
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['DateTimePicker', 'DateTimePicker']}>
-                <DateTimePicker
-                  label="Select Date and Time"
-                  value={value}
-                  onChange={(newValue) => {
-                    setValue(newValue);
-                    console.log(value?.toJSON());
-                  }}
-                />
-              </DemoContainer>
+              <TimePicker
+                label="To Time"
+                value={toTime}
+                onChange={(newValue) => setToTime(newValue)}
+              />
             </LocalizationProvider>
+            <Button variant="contained" onClick={fetchData}>
+              {filterButton}
+            </Button>
           </div>
-          <Button className="w-1/4 " variant="contained" onClick={fetchData}>
-            Filter
-          </Button>
         </FormControl>
       </div>
-      <DimensionSection response={data} />
+      {loading ? (
+        <div>Loading ... </div>
+      ) : dataCount === 0 ? (
+        <div className="flex  h-40  justify-center align-middle">
+          <p className="self-center text-lg font-semibold ">
+            There is no data for the selected range !
+          </p>
+        </div>
+      ) : (
+        <DimensionSection response={data} />
+      )}
     </>
   );
 }

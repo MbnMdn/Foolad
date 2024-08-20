@@ -48,10 +48,9 @@
 //
 // export default PictureSection;
 
+import React, { useEffect, useState } from 'react';
 
-import React, { useEffect, useState } from "react";
-
-import { ENV } from '../../../scripts/settings';
+import { ENV } from '../../scripts/settings';
 
 interface PictureSectionProps {
   dataRecordOn: boolean;
@@ -61,19 +60,18 @@ interface PictureSectionProps {
 }
 
 const PictureSection: React.FC<PictureSectionProps> = ({
-                                                         dataRecordOn,
-                                                         pictureTypeOn,
-                                                         pollingOn,
-                                                         response,
-                                                       }) => {
-  const [imageSrc, setImageSrc] = useState<string>("");
+  dataRecordOn,
+  pictureTypeOn,
+  pollingOn,
+  response,
+}) => {
+  const [imageSrc, setImageSrc] = useState<string>('');
 
   useEffect(() => {
     const newImageSrc = pictureTypeOn
       ? ENV.apiUrl + response?.zero_shot
       : ENV.apiUrl + response?.raw_image;
     setImageSrc(newImageSrc);
-    console.log(imageSrc)
   }, [pictureTypeOn, response]);
 
   return (
@@ -85,11 +83,11 @@ const PictureSection: React.FC<PictureSectionProps> = ({
       <div className="flex gap-5">
         <h3>Dimensions:</h3>
         <p>
-          Length: <span>{response?.data?.slab_metadata?.Length} mm</span>
+          Length: <span>{response?.data?.slab_metadata?.Length_mm} mm</span>
         </p>
 
         <p>
-          Width: <span>{response?.data?.slab_metadata?.Width} mm</span>
+          Width: <span>{response?.data?.slab_metadata?.Width_mm} mm</span>
         </p>
       </div>
     </div>

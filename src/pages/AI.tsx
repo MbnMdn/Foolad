@@ -2,6 +2,7 @@ import { Alert, Button, Snackbar, SnackbarCloseReason, TextField } from '@mui/ma
 import React, { useEffect, useState } from 'react';
 
 import api from '../scripts/api';
+import { endPoints } from '../scripts/endPoints';
 
 interface SnackbarState {
   open: boolean;
@@ -43,18 +44,21 @@ const initialSnackbarState: SnackbarState = {
 export default function AI() {
   const [data, setData] = useState<AISettingsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState();
   const [snackbarState, setSnackbarState] = useState(initialSnackbarState);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get('/settings/ai');
+        const response = await api.get(endPoints.settings_ai);
         const fetchedData: AISettingsData = response.data.settings_data;
         setData(fetchedData);
-        console.log(fetchedData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        setError('- Error - ' + error);
         setLoading(false);
       }
     };
@@ -79,8 +83,10 @@ export default function AI() {
         ? {
             ...prevData,
             [field]: {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               ...prevData[field],
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               [subField]: prevData[field][subField].map((val, i) =>
                 i === index ? value : val,
@@ -132,8 +138,8 @@ export default function AI() {
     };
 
     try {
-      const response = await api.post('/settings/ai', payload);
-      console.log('post');
+      const response = await api.post(endPoints.settings_ai, payload);
+      // const response = await api.post('/settings/ai', payload);
       console.log('Settings updated successfully:', response.data);
       setSnackbarState({ ...snackbarState, open: true });
     } catch (error) {
@@ -150,6 +156,8 @@ export default function AI() {
   };
 
   if (loading) return <div>Loading...</div>;
+
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="flex flex-col gap-10">
@@ -212,7 +220,12 @@ export default function AI() {
         />
       </div>
 
-      <Button variant="contained" color="primary" onClick={handleSubmit}>
+      <Button
+        className="w-72 self-center"
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+      >
         Submit
       </Button>
 
